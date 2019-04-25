@@ -1,0 +1,3 @@
+rem project name, e.g. 'cisc5550-demo' is up to you
+call gcloud compute instances delete cisc5550-project --project cisc5550-demo
+call gcloud compute firewall-rules delete rule-allow-tcp-5000 --project cisc5550-demo
