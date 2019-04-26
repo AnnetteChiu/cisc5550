@@ -1,0 +1,30 @@
+CISC 5550 Cloud Computing Final Exam
+due May 9th
+Semester Report
+(10 points) Write a report titled "What is Cloud Computing?", 1 to 3 pages, discuss what Cloud Computing means in your opinion.
+It is graded by the following criteria:
+•	opinion is presented clearly
+•	opnion makes sense
+•	the terminiology is used correctly, following the community convention
+•	general quality of good writing
+Cloud Development and Deployment Project
+(20 points) Extend the project done as homework #4 in any way of your choice. Here are some of the possible otions:
+•	add interesting or useful features to the application, e.g. add user account and/or log-in, add dates, implement reminders
+o	extend the API
+o	use front-end framework, e.g. react.js, vue.js, angular2, etc
+•	add new features making of other public web APIs, e.g.
+o	facebook API, https://developers.facebook.com/tools
+o	twitter API
+o	google tranlate API, https://cloud.google.com/translate/docs/quickstart
+•	use kubernetes deployment file and docker compose to specify the app and the web service
+•	data persistence
+o	implement efficient and scalable persistence
+o	use different database technology, e.g. using MySQL server
+o	use docker volume
+•	more robust script for easily deployment and management
+•	deploy the application and service to a different cloud platform, e.g. Amazon AWS or Microsoft Azure
+You need to write a report to describe what you do. The project is graded based on:
+1.	how much more technology experimented/explored beyond home work #4
+2.	how clear the report is written
+
+
