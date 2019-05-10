@@ -1,63 +1,67 @@
 # This is a simple example web app that is meant to illustrate the basics.
-from flask import Flask, render_template, redirect, g, request, url_for
-import sqlite3
-
-DATABASE = 'todolist.db'
+from flask import Flask, render_template, redirect, g, request, url_for, jsonify, json
+import urllib
+import requests  # similar purpose to urllib.request, just more convenience
+import os
 
 app = Flask(__name__)
-app.config.from_object(__name__)
+
+#TODO_API_URL = "http://"+os.environ['TODO_API_IP']+":5001"
+TODO_API_URL = "http://127.0.0.1:5001"
 
 
 @app.route("/")
-def show_list():
-    db = get_db()
-    cur = db.execute('SELECT what_to_do, due_date, status FROM entries')
-    entries = cur.fetchall()
-    tdlist = [dict(what_to_do=row[0], due_date=row[1], status=row[2])
-              for row in entries]
-    return render_template('index.html', todolist=tdlist)
+def login():
+    return render_template('login.html', errorInfo=False)
 
 
-@app.route("/add", methods=['POST'])
-def add_entry():
-    db = get_db()
-    db.execute('insert into entries (what_to_do, due_date) values (?, ?)',
-               [request.form['what_to_do'], request.form['due_date']])
-    db.commit()
-    return redirect(url_for('show_list'))
+@app.route("/login", methods=['POST'])
+def login_check():
+    resp = requests.post(TODO_API_URL+"/api/login", json={
+                  "NAME": request.form['name'], "PW": request.form['pw']})
+    print(resp)
+    resp = resp.json()
+    print(resp)
+    if resp['result']:
+        return redirect(url_for('show_list', userid=resp['userid'][0]))
+    else:
+        return render_template('login.html', errorInfo=True)
 
 
-@app.route("/delete/<item>")
-def delete_entry(item):
-    db = get_db()
-    db.execute("DELETE FROM entries WHERE what_to_do='"+item+"'")
-    db.commit()
-    return redirect(url_for('show_list'))
+@app.route("/show/<userid>")
+def show_list(userid):
+    userid = urllib.parse.quote(userid)
+    user_name = requests.get(TODO_API_URL+"/api/username/"+userid)
+    user_name = user_name.json()
+    resp = requests.get(TODO_API_URL+"/api/items/"+userid)
+    resp = resp.json()
+    print(resp)
+    return render_template('index.html', username=user_name['name'], uid=userid, todolist=resp,things=len(resp))
 
 
-@app.route("/mark/<item>")
-def mark_as_done(item):
-    db = get_db()
-    db.execute("UPDATE entries SET status='done' WHERE what_to_do='"+item+"'")
-    db.commit()
-    return redirect(url_for('show_list'))
+@app.route("/add/<userid>", methods=['POST'])
+def add_entry(userid):
+    userid = urllib.parse.quote(userid)
+    requests.post(TODO_API_URL+"/api/items", json={
+                  "what_to_do": request.form['what_to_do'], "due_date": request.form['due_date'], 'ID': userid})
+    return redirect(url_for('show_list', userid=userid))
 
 
-def get_db():
-    """Opens a new database connection if there is none yet for the
-    current application context.
-    """
-    if not hasattr(g, 'sqlite_db'):
-        g.sqlite_db = sqlite3.connect(app.config['DATABASE'])
-    return g.sqlite_db
+@app.route("/delete/<userid>/<item>")
+def delete_entry(userid, item):
+    userid = urllib.parse.quote(userid)
+    item = urllib.parse.quote(item)
+    requests.delete(TODO_API_URL+"/api/items/"+userid + '/' + item)
+    return redirect(url_for('show_list', userid=userid))
 
 
-@app.teardown_appcontext
-def close_db(error):
-    """Closes the database again at the end of the request."""
-    if hasattr(g, 'sqlite_db'):
-        g.sqlite_db.close()
+@app.route("/mark/<userid>/<item>")
+def mark_as_done(userid, item):
+    userid = urllib.parse.quote(userid)
+    item = urllib.parse.quote(item)
+    requests.put(TODO_API_URL+"/api/items/" + userid + '/' +item)
+    return redirect(url_for('show_list', userid=userid))
 
 
 if __name__ == "__main__":
-    app.run("0.0.0.0", port=80)
+    app.run("0.0.0.0")

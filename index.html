@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
     <style>
         .done {
             text-decoration: line-through;
@@ -17,15 +18,21 @@
 
 <body>
     <div class="container">
-        <h3>oh, so many things to do...</h3>
+        <h2>Todo list for {{username}}</h2>
+        <div id="app">
+             <template v-if="hasThings">
+                <h3>oh, so many things to do...</h3>
+             </template>
+        </div>
+
         <table class='table'>
             {% for entry in todolist %}
             <tr>
                 <td {% if entry.status=='done' %} class='done' {% endif %}>{{ entry.what_to_do|safe }}</td>
                 <td>{{ entry.due_date|safe }}</td>
                 <td>
-                    <button onclick="location.href='/mark/{{entry.what_to_do|urlencode}}'">mark as done </button>
-                    <button onclick="location.href='/delete/{{entry.what_to_do|urlencode}}'">delete</button>
+                    <button onclick="location.href='/mark/{{ uid|safe }}/{{entry.what_to_do|urlencode}}'">mark as done </button>
+                    <button onclick="location.href='/delete/{{ uid|safe }}/{{entry.what_to_do|urlencode}}'">delete</button>
                 </td>
             </tr>
             {% else %}
@@ -40,7 +47,7 @@
     </div>
 
     <div class="container">
-        <form action="/add" method="POST" id="add-form" style="display:none">
+        <form action="/add/{{ uid|safe }}" method="POST" id="add-form" style="display:none">
             <div class="row">
                 <div class="col-sm-6">
                     what to do:
@@ -58,6 +65,13 @@
     </div>
 
     <script>
+        new Vue({
+              el: '#app',
+              data: {
+              {% if things > 0 %} hasThings: true {% else %} hasThings: false {% endif %}
+              }
+            })
+
         var show_entry_form = false;
 
         function toggle_entry_form() {
@@ -70,6 +84,7 @@
             }
             show_entry_form = !show_entry_form;
         };
+
     </script>
 </body>
 

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Todo List Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+    <style>
+        .done {
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Please login with User Name and Password </h2>
+    <h2>_____</h2>
+    <div class="container">
+        <form action="/login" method="POST" id="add-form">
+            <div class="row">
+                <div class="col-sm-6">
+                    User Name:
+                    <input type="text" size="50" name="name" value="" />
+                </div>
+                <div class="col-sm-3">
+                    Password:
+                    <input type="text" name="pw" value="" />
+                </div>
+                <div class="col-sm-3">
+                    <input type="submit" value="login" />
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="app">
+         <template v-if="error">
+            <h1>Ｕser name or password is wrong, please try again!</h1>
+         </template>
+    </div>
+
+    <script>
+        new Vue({
+          el: '#app',
+          data: {
+          {% if errorInfo %} error: true {% else %} error: false {% endif %}
+          }
+        })
+    </script>
+</body>
+
+</html>
